@@ -6,9 +6,9 @@ import (
 )
 
 func main() {
+	queue.InitMetrics()
 	queue.InitQueueDispatcher()
 	server := InitWebServer()
-	queue.InitMetrics()
 
 	metrics.InitPrometheus()
 	server.Run()

@@ -1,5 +1,8 @@
 package queue
 
+//JobQueue ... a buffered channel that we can send work requests on.
+var JobQueue chan Queuable
+
 //Queuable ... interface of Queuable Job
 type Queuable interface {
 	Handle() error
@@ -9,22 +12,27 @@ type Queuable interface {
 type Dispatcher struct {
 	maxWorkers int
 	WorkerPool chan chan Queuable
+	Workers    []Worker
 }
 
 //NewDispatcher ... creates new queue dispatcher
 func NewDispatcher(maxWorkers int) *Dispatcher {
+	// make job
+	if JobQueue == nil {
+		JobQueue = make(chan Queuable, 10)
+	}
 	pool := make(chan chan Queuable, maxWorkers)
 	return &Dispatcher{WorkerPool: pool, maxWorkers: maxWorkers}
 }
 
 //Run ... starts work of dispatcher and creates the workers
 func (d *Dispatcher) Run() {
-	// make job
-	JobQueue = make(chan Queuable, 10)
 	// starting n number of workers
 	for i := 0; i < d.maxWorkers; i++ {
+		RunningWorkers.WithLabelValues("Emails").Inc()
 		worker := NewWorker(d.WorkerPool)
 		worker.Start()
+		d.Workers = append(d.Workers, worker)
 	}
 
 	go d.dispatch()

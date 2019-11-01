@@ -4,19 +4,7 @@ import (
 	"fmt"
 	"log"
 	"time"
-
-	"github.com/ahmedash95/go-channels/metrics"
-	"github.com/prometheus/client_golang/prometheus"
 )
-
-var (
-	JobsProcessed  *prometheus.CounterVec
-	RunningJobs    *prometheus.GaugeVec
-	ProcessingTime *prometheus.HistogramVec
-)
-
-//JobQueue ... a buffered channel that we can send work requests on.
-var JobQueue chan Queuable
 
 // counter increases every time we create a worker
 var i = 0
@@ -37,40 +25,6 @@ func NewWorker(workerPool chan chan Queuable) Worker {
 		WorkerPool: workerPool,
 		JobChannel: make(chan Queuable),
 		quit:       make(chan bool)}
-}
-
-func InitMetrics() {
-	JobsProcessed = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Namespace: "worker",
-			Subsystem: "jobs",
-			Name:      "processed_total",
-			Help:      "Total number of jobs processed by the workers",
-		},
-		[]string{"worker_id", "type"},
-	)
-
-	RunningJobs = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Namespace: "worker",
-			Subsystem: "jobs",
-			Name:      "running",
-			Help:      "Number of jobs inflight",
-		},
-		[]string{"type"},
-	)
-
-	ProcessingTime = prometheus.NewHistogramVec(
-		prometheus.HistogramOpts{
-			Namespace: "worker",
-			Subsystem: "jobs",
-			Name:      "process_time_seconds",
-			Help:      "Amount of time spent processing jobs",
-		},
-		[]string{"worker_id", "type"},
-	)
-
-	metrics.PushRegister(ProcessingTime, RunningJobs, JobsProcessed)
 }
 
 //Start ... initiate worker to start lisntening for upcomings queueable jobs
@@ -102,6 +56,7 @@ func (w Worker) Start() {
 
 // Stop signals the worker to stop listening for work requests.
 func (w Worker) Stop() {
+	RunningWorkers.WithLabelValues("Emails").Dec()
 	go func() {
 		w.quit <- true
 	}()

@@ -3,7 +3,7 @@ package queue
 var QueueDispatcher *Dispatcher
 
 func InitQueueDispatcher() {
-	QueueDispatcher = NewDispatcher(2)
+	QueueDispatcher = NewDispatcher(4)
 	QueueDispatcher.Run()
 }
 
