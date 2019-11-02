@@ -2,6 +2,9 @@
 
 a very simple go app shows how to use Go Channels for async tasks and Montior it with Prometheus & Grafana
 
+# Grafana Dashboard Result
+<img src="https://i.imgur.com/3aajUZt.gif">
+
 # Installation
 - clone the repo
 - docker install
