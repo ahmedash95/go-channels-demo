@@ -15,4 +15,5 @@ a very simple go app shows how to use Go Channels for async tasks and Montior it
 - send a requests to http://localhost:8080/email?to=ahmed.ashraf@email.com as a test
 
 # Blog post
-- https://ahmedash.com/blog/article/golang-channels-and-monitoring/
+- (English) https://dev.to/ahmedash95/understand-golang-channels-and-how-to-monitor-with-grafana-154
+- (Arabic) https://ahmedash.com/blog/article/golang-channels-and-monitoring/
